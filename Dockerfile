@@ -1,4 +1,3 @@
 FROM golang
-RUN go get github.com/astaxie/beego
-RUN go get github.com/beego/bee
+RUN go get github.com/quchunguang/snsrobot-go
 EXPOSE 4000

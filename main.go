@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	DB_HOST     = os.Getenv("POSTGRES_PORT_5432_TCP_ADDRs")
+	DB_HOST     = os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
 	DB_USER     = "app"
 	DB_PASSWORD = "123456"
 	DB_NAME     = "snsrobot"
