@@ -1,15 +1,7 @@
 # snsrobot-go
-Social network for robots with golang
+Social network for robots with golang.
 
-## Build and run SNS server from docker
-
-```bash
-sudo apt-get install docker
-sudo docker run --name -d snsrobot-go-db -e POSTGRES_PASSWORD=123456 quchunguang/snsrobot-go-db
-sudo docker run --name -d snsrobot-go -it -p 8080:4000 --link db:postgres quchunguang/snsrobot-go
-```
-
-## Build and run SNS client
+## Deploy SNS Client
 
 ```bash
 go get -u github.com/quchunguang/snsrobot-go/snsrobot
@@ -19,44 +11,46 @@ snsroboot --help
 x-www-browser http://localhost:8080
 ```
 
-## Build docker image (ADVANCED)
-
-Deployment and run from docker container.
-Following commands are tested on Ubuntu 15.10.
-
-Install Docker.
+## Deploy SNS Server with Docker
 
 ```bash
-sudo apt-get install git docker
+sudo docker run -d --name snsrobotdb -e POSTGRES_PASSWORD=123456 postgres
+sudo docker exec -it snsrobotdb /usr/bin/createdb -U postgres snsrobot
+
+git clone https://github.com/quchunguang/snsrobot-go
+cd snsrobot-go/snsrobotd
+sudo docker build -t snsrobotd .
+sudo docker run -d --name snsrobotd -p 8080:4000 --link snsrobotdb:postgres snsrobotd
 ```
 
-Create and run docker container of postgresql database.
+## Create Develop Environment
 
 ```bash
-# Create db docker
 sudo docker run --name db -e POSTGRES_PASSWORD=123456 -d postgres
-sudo docker exec -it db /bin/bash
-
-psql -U postgres
-CREATE USER app WITH PASSWORD '123456';
-CREATE DATABASE snsrobot;
-GRANT ALL PRIVILEGES ON DATABASE snsrobot TO app;
-<CTRL-D>
-
-cat <<_END >>/var/lib/postgresql/data/pg_hba.conf
-host all "app" 0.0.0.0/0 trust
-_END
-<CTRL-D>
-
-sudo docker stop db
-sudo docker start db
-```
-
-Create and run docker container of snsrobotd.
-
-```bash
+sudo docker exec -it db /usr/bin/createdb -U postgres snsrobot
 git clone https://github.com/quchunguang/snsrobot-go
 cd snsrobot-go
-sudo docker build -t snsrobot-go .
-sudo docker run -d -it --name snsrobot-go -p 8080:4000 --link db:postgres snsrobot-go
+sudo docker run -it --name snsrobotd -v "$PWD":/go/snsrobot-go -p 8080:4000 --link db:postgres golang
+```
+
+All we need of the docker container `db`, instance of postgresql server,
+is create a database named `snsrobot` in it, so it can be shared with other projects.
+Now we got the terminal of docker container.
+Change source with fun in $PWD of host machine.
+And then build/run it in the terminal of the docker container by,
+
+```bash
+# install dependences of both sides
+go get github.com/lib/pq
+
+
+# server side build in container
+cd snsrobot-go/snsrobotd
+go build
+./snsrobotd
+
+# client side build in container
+cd snsrobot-go/snsrobot
+go build
+./snsrobot --help
 ```

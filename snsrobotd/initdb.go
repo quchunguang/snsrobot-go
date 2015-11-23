@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"log"
 	"strings"
 )
 
@@ -46,4 +47,6 @@ func InitDB(db *sql.DB) {
 	}
 
 	err = tx.Commit()
+	checkErr(err)
+	log.Println("Database initialized.")
 }
