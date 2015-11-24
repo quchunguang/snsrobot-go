@@ -1,23 +1,36 @@
 package main
 
 import (
-	_ "github.com/quchunguang/snsrobot-go/snsrobotd/docs"
-	_ "github.com/quchunguang/snsrobot-go/snsrobotd/routers"
-
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
+	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
+	"log"
+	// "os"
 )
 
-func init() {
-	orm.RegisterDataBase("default", "postgres", "postgres://postgres:123456@172.17.0.2:5432/snsrobot?sslmode=disable")
+var (
+	// DB_HOST     = os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
+	DB_HOST     = "172.17.0.2"
+	DB_USER     = "postgres"
+	DB_PASSWORD = "123456"
+	DB_NAME     = "snsrobot"
+)
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
-	if beego.RunMode == "dev" {
-		beego.DirectoryIndex = true
-		beego.StaticDir["/swagger"] = "swagger"
-	}
-	beego.Run()
-}
+	dbinfo := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		DB_HOST, DB_USER, DB_PASSWORD, DB_NAME,
+	)
+	log.Println(dbinfo)
+	db, err := sql.Open("postgres", dbinfo)
+	checkErr(err)
+	InitDB(db)
 
+	defer db.Close()
+}

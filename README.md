@@ -57,6 +57,7 @@ sudo docker inspect db | grep IPAddress
 
 # generate code, 172.17.0.2 is my IP address of `db` container
 bee api snsrobotd -driver="postgres" -conn="postgres://postgres:123456@172.17.0.2:5432/snsrobot?sslmode=disable"
+cd snsrobotd
 
 # run service with watch by default.
 # -gendoc=true  generate document automatically
@@ -69,5 +70,6 @@ x-www-browser http://localhost:8080/swagger
 
 ## Reference
 
+1. [postgresql doc](http://www.postgresql.org/docs/current/static/)
 1. [beego doc](http://beego.me/docs/intro/)
 1. [bee api](https://github.com/beego/bee#bee-api)
